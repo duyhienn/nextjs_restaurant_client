@@ -12,6 +12,7 @@ const menuItems = [
   {
     title: 'Đơn hàng',
     href: '/orders',
+    authRequired: true,
   },
   {
     title: 'Đăng nhập',
