@@ -12,7 +12,7 @@ export async function POST(request: Request) {
   cookieStore.delete('refreshToken')
 
   if (!accessToken || !refreshToken) {
-    return Response.json({ message: 'The token is either invalid or does not exist.' }, { status: 200 })
+    return Response.json({ message: 'The token is either invalid or does not exist.' }, { status: 401 })
   }
   try {
     const { payload } = await authApiRequest.sLogout({ accessToken, refreshToken })

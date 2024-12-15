@@ -1,5 +1,11 @@
 import http from '@/lib/http'
-import { LoginBodyType, LoginResType, LogoutBodyType } from '@/schemaValidations/auth.schema'
+import {
+  LoginBodyType,
+  LoginResType,
+  LogoutBodyType,
+  RefreshTokenBodyType,
+  RefreshTokenResType,
+} from '@/schemaValidations/auth.schema'
 
 const authApiRequest = {
   sLogin: (body: LoginBodyType) => http.post<LoginResType>('/auth/login', body),
@@ -16,9 +22,12 @@ const authApiRequest = {
     ),
   /**
    *
-   * @description In client side, cookies will be attached to the request automatically
+   * @description Call to route handler ,(in client side) cookies will be attached to the request automatically
    */
   logout: () => http.post('/api/auth/logout', null, { baseUrl: '' }),
+  sRefreshToken: (body: RefreshTokenBodyType) => http.post<RefreshTokenResType>('/auth/refresh-token', body),
+  refreshToken: (body: RefreshTokenBodyType) =>
+    http.post<RefreshTokenResType>('/api/auth/refresh-token', null, { baseUrl: '' }),
 }
 
 export default authApiRequest

@@ -54,14 +54,7 @@ const request = async <Response>(
   } else if (options?.body) {
     body = JSON.stringify(options.body)
   }
-  const baseHeaders: {
-    [key: string]: string
-  } =
-    body instanceof FormData
-      ? {}
-      : {
-          'Content-Type': 'application/json',
-        }
+  const baseHeaders: { [key: string]: string } = body instanceof FormData ? {} : { 'Content-Type': 'application/json' }
   if (isClient) {
     const accessToken = localStorage.getItem('accessToken')
     if (accessToken) {
@@ -122,6 +115,8 @@ const request = async <Response>(
           }
         }
       } else {
+        // Đây là trường hợp khi mà chúng ta vẫn còn access token (còn hạn)
+        // Và chúng ta gọi API ở Next.js Server (Route Handler , Server Component) đến Server Backend
         const accessToken = (options?.headers as any)?.Authorization.split('Bearer ')[1]
         redirect(`/logout?accessToken=${accessToken}`)
       }

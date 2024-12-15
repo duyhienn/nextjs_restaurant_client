@@ -5,14 +5,14 @@ import { useMutation, useQuery } from '@tanstack/react-query'
 export const useAccountMe = () => {
   return useQuery({
     queryKey: ['account-me'],
-    queryFn: accountApiRequest.getProfile,
+    queryFn: accountApiRequest.me,
   })
 }
 // export const useAccountMe = (onSuccess?: (data: AccountResType) => void) => {
 //   return useQuery({
 //     queryKey: ['account-profile'],
 //     queryFn: async () => {
-//       const res = await accountApiRequest.getProfile()
+//       const res = await accountApiRequest.me()
 //       if (onSuccess) onSuccess(res.payload)
 //       return res
 //     },
