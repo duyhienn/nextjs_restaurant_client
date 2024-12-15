@@ -31,7 +31,6 @@ export async function PUT(request: Request) {
     })
     return Response.json(payload)
   } catch (error) {
-    console.log(error instanceof HttpError)
     if (error instanceof HttpError) {
       return Response.json({ message: error.payload.message }, { status: error.status })
     } else {

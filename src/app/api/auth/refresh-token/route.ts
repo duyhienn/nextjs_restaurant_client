@@ -1,10 +1,9 @@
 import authApiRequest from '@/apiRequests/auth'
-import { LoginBodyType } from '@/schemaValidations/auth.schema'
+import { RefreshTokenBodyType } from '@/schemaValidations/auth.schema'
 import { cookies } from 'next/headers'
 import jwt, { JwtPayload } from 'jsonwebtoken'
 import { HttpError } from '@/lib/http'
 export async function POST(request: Request) {
-  const body = (await request.json()) as LoginBodyType
   const cookieStore = await cookies()
   const refreshToken = cookieStore.get('refreshToken')?.value
 

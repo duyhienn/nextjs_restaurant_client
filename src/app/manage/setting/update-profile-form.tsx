@@ -86,7 +86,6 @@ export default function UpdateProfileForm() {
     }
   }
 
-  console.log('co re-render khong')
   return (
     <Form {...form}>
       <form
