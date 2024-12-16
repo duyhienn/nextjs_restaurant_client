@@ -3,6 +3,8 @@ import { EntityError } from '@/lib/http'
 import { type ClassValue, clsx } from 'clsx'
 import { UseFormSetError } from 'react-hook-form'
 import { twMerge } from 'tailwind-merge'
+import jwt, { JwtPayload } from 'jsonwebtoken'
+import authApiRequest from '@/apiRequests/auth'
 
 const isBrowser = typeof window !== 'undefined'
 
@@ -79,4 +81,28 @@ export const setAccessTokenToLocalStorage = (accessToken: string) => {
  */
 export const setRefreshTokenToLocalStorage = (refreshToken: string) => {
   return isBrowser ? localStorage.setItem('refreshToken', refreshToken) : null
+}
+
+/**
+ *
+ */
+export const checkAndRefreshToken = async (params?: { onError?: () => void; onSuccess?: () => void }) => {
+  const accessToken = getAccessTokenFromLocalStorage()
+  const refreshToken = getRefreshTokenFromLocalStorage()
+  if (!accessToken || !refreshToken) return
+  const decodedAccessToken = jwt.decode(accessToken) as JwtPayload
+  const decodedRefreshToken = jwt.decode(refreshToken) as JwtPayload
+  const now = Math.round(new Date().getTime() / 1000)
+  if (decodedAccessToken.exp! <= now) return
+
+  if (decodedAccessToken.exp! - now < (decodedAccessToken.exp! - decodedAccessToken.iat!) / 3) {
+    try {
+      const res = await authApiRequest.refreshToken()
+      setAccessTokenToLocalStorage(res.payload.data.accessToken)
+      setRefreshTokenToLocalStorage(res.payload.data.refreshToken)
+      if (params?.onSuccess) params.onSuccess()
+    } catch (error) {
+      if (params?.onError) params.onError()
+    }
+  }
 }
