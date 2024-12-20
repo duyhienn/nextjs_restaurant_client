@@ -83,8 +83,16 @@ export const setRefreshTokenToLocalStorage = (refreshToken: string) => {
   return isBrowser ? localStorage.setItem('refreshToken', refreshToken) : null
 }
 
+export const removeTokensFromLocalStorage = () => {
+  if (isBrowser) {
+    localStorage.removeItem('accessToken')
+    localStorage.removeItem('refreshToken')
+  }
+}
+
 /**
- *
+ * Check and refresh token
+ * @param params 2 Callback functions: onError and onSuccess
  */
 export const checkAndRefreshToken = async (params?: { onError?: () => void; onSuccess?: () => void }) => {
   const accessToken = getAccessTokenFromLocalStorage()
@@ -92,8 +100,13 @@ export const checkAndRefreshToken = async (params?: { onError?: () => void; onSu
   if (!accessToken || !refreshToken) return
   const decodedAccessToken = jwt.decode(accessToken) as JwtPayload
   const decodedRefreshToken = jwt.decode(refreshToken) as JwtPayload
-  const now = Math.round(new Date().getTime() / 1000)
-  if (decodedAccessToken.exp! <= now) return
+
+  const now = new Date().getTime() / 1000 - 1
+
+  if (decodedRefreshToken.exp! <= now) {
+    removeTokensFromLocalStorage()
+    return params?.onError && params.onError()
+  }
 
   if (decodedAccessToken.exp! - now < (decodedAccessToken.exp! - decodedAccessToken.iat!) / 3) {
     try {
