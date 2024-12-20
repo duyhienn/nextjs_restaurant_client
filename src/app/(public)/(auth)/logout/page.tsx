@@ -5,9 +5,9 @@ import { getAccessTokenFromLocalStorage, getRefreshTokenFromLocalStorage } from 
 import { useLogoutMutation } from '@/queries/useAuth'
 import { UseMutateAsyncFunction } from '@tanstack/react-query'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useEffect, useRef } from 'react'
+import { Suspense, useEffect, useRef } from 'react'
 
-export default function LogoutPage() {
+function Logout() {
   const { setIsAuth } = useAppContext()
   const { mutateAsync, isSuccess } = useLogoutMutation()
   const router = useRouter()
@@ -36,4 +36,12 @@ export default function LogoutPage() {
     }
   }, [mutateAsync, router, refreshTokenFromUrl, accessTokenFromUrl, setIsAuth])
   return <div>{isSuccess ? 'Log out....' : ''}</div>
+}
+
+export default function LogoutPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <Logout />
+    </Suspense>
+  )
 }
