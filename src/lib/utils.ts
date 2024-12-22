@@ -20,7 +20,7 @@ export const normalizePath = (path: string) => {
 }
 
 /**
- * Handle error from api (EntityError 422)
+ * Handle error from api (included EntityError 422)
  * @param error Error from api
  * @param setError React Hook Form's setError function
  * @param duration Duration of toast

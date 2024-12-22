@@ -11,7 +11,7 @@ import {
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
-  useReactTable,
+  useReactTable
 } from '@tanstack/react-table'
 
 import { Button } from '@/components/ui/button'
@@ -22,7 +22,7 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuTrigger,
+  DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
@@ -39,29 +39,32 @@ import {
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
-  AlertDialogTitle,
+  AlertDialogTitle
 } from '@/components/ui/alert-dialog'
 import { useSearchParams } from 'next/navigation'
 import AutoPagination from '@/components/auto-pagination'
+import { useDeleteEmployeeAccountMutation, useGetListEmployeeAccountQuery } from '@/queries/useAccount'
+import { toast } from '@/hooks/use-toast'
+import { handleErrorApi } from '@/lib/utils'
 
 type AccountItem = AccountListResType['data'][0]
 
 const AccountTableContext = createContext<{
-  setEmployeeIdEdit: (value: number) => void
   employeeIdEdit: number | undefined
+  setEmployeeIdEdit: (value: number) => void
   employeeDelete: AccountItem | null
   setEmployeeDelete: (value: AccountItem | null) => void
 }>({
-  setEmployeeIdEdit: (value: number | undefined) => {},
   employeeIdEdit: undefined,
+  setEmployeeIdEdit: (value: number | undefined) => {},
   employeeDelete: null,
-  setEmployeeDelete: (value: AccountItem | null) => {},
+  setEmployeeDelete: (value: AccountItem | null) => {}
 })
 
 export const columns: ColumnDef<AccountType>[] = [
   {
     accessorKey: 'id',
-    header: 'ID',
+    header: 'ID'
   },
   {
     accessorKey: 'avatar',
@@ -73,12 +76,12 @@ export const columns: ColumnDef<AccountType>[] = [
           <AvatarFallback className='rounded-none'>{row.original.name}</AvatarFallback>
         </Avatar>
       </div>
-    ),
+    )
   },
   {
     accessorKey: 'name',
     header: 'Tên',
-    cell: ({ row }) => <div className='capitalize'>{row.getValue('name')}</div>,
+    cell: ({ row }) => <div className='capitalize'>{row.getValue('name')}</div>
   },
   {
     accessorKey: 'email',
@@ -90,7 +93,7 @@ export const columns: ColumnDef<AccountType>[] = [
         </Button>
       )
     },
-    cell: ({ row }) => <div className='lowercase'>{row.getValue('email')}</div>,
+    cell: ({ row }) => <div className='lowercase'>{row.getValue('email')}</div>
   },
   {
     id: 'actions',
@@ -105,7 +108,7 @@ export const columns: ColumnDef<AccountType>[] = [
         setEmployeeDelete(row.original)
       }
       return (
-        <DropdownMenu>
+        <DropdownMenu modal={false}>
           <DropdownMenuTrigger asChild>
             <Button variant='ghost' className='h-8 w-8 p-0'>
               <span className='sr-only'>Open menu</span>
@@ -120,17 +123,34 @@ export const columns: ColumnDef<AccountType>[] = [
           </DropdownMenuContent>
         </DropdownMenu>
       )
-    },
-  },
+    }
+  }
 ]
 
 function AlertDialogDeleteAccount({
   employeeDelete,
-  setEmployeeDelete,
+  setEmployeeDelete
 }: {
   employeeDelete: AccountItem | null
   setEmployeeDelete: (value: AccountItem | null) => void
 }) {
+  const { mutateAsync } = useDeleteEmployeeAccountMutation()
+  const deleteAccountEmployee = async () => {
+    if (!employeeDelete?.id) return
+    try {
+      const result = await mutateAsync(employeeDelete?.id)
+      setEmployeeDelete(null)
+      toast({
+        title: 'Success',
+        description: result.payload.message
+      })
+    } catch (error) {
+      handleErrorApi({
+        error
+      })
+    }
+  }
+
   return (
     <AlertDialog
       open={Boolean(employeeDelete)}
@@ -149,7 +169,7 @@ function AlertDialogDeleteAccount({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction>Continue</AlertDialogAction>
+          <AlertDialogAction onClick={deleteAccountEmployee}>Continue</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
@@ -164,14 +184,17 @@ export default function AccountTable() {
   // const params = Object.fromEntries(searchParam.entries())
   const [employeeIdEdit, setEmployeeIdEdit] = useState<number | undefined>()
   const [employeeDelete, setEmployeeDelete] = useState<AccountItem | null>(null)
-  const data: any[] = []
+
+  const accountEmployeeListQuery = useGetListEmployeeAccountQuery()
+  const data = accountEmployeeListQuery.data?.payload.data ?? []
+
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = useState({})
   const [pagination, setPagination] = useState({
     pageIndex, // Gía trị mặc định ban đầu, không có ý nghĩa khi data được fetch bất đồng bộ
-    pageSize: PAGE_SIZE, //default page size
+    pageSize: PAGE_SIZE //default page size
   })
 
   const table = useReactTable({
@@ -192,14 +215,14 @@ export default function AccountTable() {
       columnFilters,
       columnVisibility,
       rowSelection,
-      pagination,
-    },
+      pagination
+    }
   })
 
   useEffect(() => {
     table.setPagination({
       pageIndex,
-      pageSize: PAGE_SIZE,
+      pageSize: PAGE_SIZE
     })
   }, [table, pageIndex])
 

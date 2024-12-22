@@ -14,14 +14,21 @@ import { Label } from '@/components/ui/label'
 import { CreateEmployeeAccountBody, CreateEmployeeAccountBodyType } from '@/schemaValidations/account.schema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PlusCircle, Upload } from 'lucide-react'
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Form, FormField, FormItem, FormMessage } from '@/components/ui/form'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { useAddEmployeeAccountMutation } from '@/queries/useAccount'
+import { useUploadMediaMutation } from '@/queries/useMedia'
+import { toast } from '@/hooks/use-toast'
+import { handleErrorApi } from '@/lib/utils'
 
 export default function AddEmployee() {
   const [file, setFile] = useState<File | null>(null)
   const [open, setOpen] = useState(false)
+  const addEmployeeAccountMutation = useAddEmployeeAccountMutation()
+  const uploadMediaMutation = useUploadMediaMutation()
+
   const avatarInputRef = useRef<HTMLInputElement | null>(null)
   const form = useForm<CreateEmployeeAccountBodyType>({
     resolver: zodResolver(CreateEmployeeAccountBody),
@@ -42,6 +49,47 @@ export default function AddEmployee() {
     return avatar
   }, [file, avatar])
 
+  useEffect(() => {
+    // Cleanup when file changes or component unmounts
+    return () => {
+      if (file) {
+        URL.revokeObjectURL(previewAvatarFromFile ?? '')
+      }
+    }
+  }, [file, previewAvatarFromFile])
+
+  const resetForm = () => {
+    form.reset()
+    setFile(null)
+  }
+
+  const onSubmit = async (values: CreateEmployeeAccountBodyType) => {
+    if (addEmployeeAccountMutation.isPending) return
+    try {
+      let body = values
+      if (file) {
+        const formData = new FormData()
+        formData.append('avatar', file)
+        const uploadImgRes = await uploadMediaMutation.mutateAsync(formData)
+        const imageUrl = uploadImgRes.payload.data
+        body = { ...values, avatar: imageUrl }
+      }
+      const result = await addEmployeeAccountMutation.mutateAsync(body)
+      setFile(null)
+      toast({
+        title: 'Success',
+        description: 'Your employee account has been added successfully',
+      })
+      resetForm()
+      setOpen(false)
+    } catch (error) {
+      handleErrorApi({
+        error,
+        setError: form.setError,
+      })
+    }
+  }
+
   return (
     <Dialog onOpenChange={setOpen} open={open}>
       <DialogTrigger asChild>
@@ -56,7 +104,12 @@ export default function AddEmployee() {
           <DialogDescription>Các trường tên, email, mật khẩu là bắt buộc</DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form noValidate className='grid auto-rows-max items-start gap-4 md:gap-8' id='add-employee-form'>
+          <form
+            noValidate
+            className='grid auto-rows-max items-start gap-4 md:gap-8'
+            id='add-employee-form'
+            onReset={resetForm}
+            onSubmit={form.handleSubmit(onSubmit)}>
             <div className='grid gap-4 py-4'>
               <FormField
                 control={form.control}
