@@ -5,6 +5,8 @@ import { UseFormSetError } from 'react-hook-form'
 import { twMerge } from 'tailwind-merge'
 import jwt, { JwtPayload } from 'jsonwebtoken'
 import authApiRequest from '@/apiRequests/auth'
+import { DishStatus, TableStatus } from '@/constants/type'
+import envConfig from '@/config'
 
 const isBrowser = typeof window !== 'undefined'
 
@@ -118,4 +120,37 @@ export const checkAndRefreshToken = async (params?: { onError?: () => void; onSu
       if (params?.onError) params.onError()
     }
   }
+}
+
+export const formatCurrency = (number: number) => {
+  return new Intl.NumberFormat('vi-VN', {
+    style: 'currency',
+    currency: 'VND',
+  }).format(number)
+}
+
+export const getVietnameseDishStatus = (status: (typeof DishStatus)[keyof typeof DishStatus]) => {
+  switch (status) {
+    case DishStatus.Available:
+      return 'Có sẵn'
+    case DishStatus.Unavailable:
+      return 'Không có sẵn'
+    default:
+      return 'Ẩn'
+  }
+}
+
+export const getVietnameseTableStatus = (status: (typeof TableStatus)[keyof typeof TableStatus]) => {
+  switch (status) {
+    case TableStatus.Available:
+      return 'Có sẵn'
+    case TableStatus.Reserved:
+      return 'Đã đặt'
+    default:
+      return 'Ẩn'
+  }
+}
+
+export const getTableLink = ({ token, tableNumber }: { token: string; tableNumber: number }) => {
+  return envConfig.NEXT_PUBLIC_URL + '/tables/' + tableNumber + '?token=' + token
 }
