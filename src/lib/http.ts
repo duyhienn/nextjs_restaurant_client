@@ -71,18 +71,17 @@ const request = async <Response>(
     ...options,
     headers: {
       ...baseHeaders,
-      ...options?.headers,
+      ...options?.headers
     } as any,
     body,
-    method,
+    method
   })
   const payload: Response = await res.json()
   const data = {
     status: res.status,
-    payload,
+    payload
   }
 
-  console.log('isClient', isClient)
   // Interceptor là nời chúng ta xử lý request và response trước khi trả về cho phía component
   if (!res.ok) {
     if (res.status === ENTITY_ERROR_STATUS) {
@@ -99,8 +98,8 @@ const request = async <Response>(
             method: 'POST',
             body: null, // Logout mình sẽ cho phép luôn luôn thành công
             headers: {
-              ...baseHeaders,
-            } as any,
+              ...baseHeaders
+            } as any
           })
           try {
             await clientLogoutRequest
@@ -153,7 +152,7 @@ const http = {
   },
   delete<Response>(url: string, options?: Omit<CustomOptions, 'body'> | undefined) {
     return request<Response>('DELETE', url, { ...options })
-  },
+  }
 }
 
 export default http

@@ -17,6 +17,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { useAddDishMutation } from '@/queries/useDish'
 import { useUploadMediaMutation } from '@/queries/useMedia'
 import { toast } from '@/hooks/use-toast'
+import revalidateApiRequest from '@/apiRequests/revalidate'
 
 export default function AddDish() {
   const [file, setFile] = useState<File | null>(null)
@@ -31,8 +32,8 @@ export default function AddDish() {
       description: '',
       price: 0,
       image: undefined,
-      status: DishStatus.Unavailable,
-    },
+      status: DishStatus.Unavailable
+    }
   })
   const image = form.watch('image')
   const name = form.watch('name')
@@ -67,19 +68,21 @@ export default function AddDish() {
         const imageUrl = uploadImageResult.payload.data
         body = {
           ...values,
-          image: imageUrl,
+          image: imageUrl
         }
       }
       const result = await addDishMutation.mutateAsync(body)
+      await revalidateApiRequest.revalidate('dishes')
+
       toast({
-        description: result.payload.message,
+        description: result.payload.message
       })
       reset()
       setOpen(false)
     } catch (error) {
       handleErrorApi({
         error,
-        setError: form.setError,
+        setError: form.setError
       })
     }
   }

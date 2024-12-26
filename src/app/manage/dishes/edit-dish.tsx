@@ -7,7 +7,7 @@ import {
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
+  DialogTitle
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -25,11 +25,12 @@ import { Textarea } from '@/components/ui/textarea'
 import { useGetDishQuery, useUpdateDishMutation } from '@/queries/useDish'
 import { useUploadMediaMutation } from '@/queries/useMedia'
 import { toast } from '@/hooks/use-toast'
+import revalidateApiRequest from '@/apiRequests/revalidate'
 
 export default function EditDish({
   id,
   setId,
-  onSubmitSuccess,
+  onSubmitSuccess
 }: {
   id?: number | undefined
   setId: (value: number | undefined) => void
@@ -47,8 +48,8 @@ export default function EditDish({
       description: '',
       price: 0,
       image: undefined,
-      status: DishStatus.Unavailable,
-    },
+      status: DishStatus.Unavailable
+    }
   })
   const image = form.watch('image')
   const name = form.watch('name')
@@ -77,7 +78,7 @@ export default function EditDish({
         image: image ?? undefined,
         description,
         price,
-        status,
+        status
       })
     }
   }, [data])
@@ -95,16 +96,17 @@ export default function EditDish({
       }
       const result = await updateDishMutation.mutateAsync(body)
       setFile(null)
+      await revalidateApiRequest.revalidate('dishes')
       toast({
         title: 'Success',
-        description: 'Your employee account has been updated successfully',
+        description: 'Your employee account has been updated successfully'
       })
       reset() // mean closing the dialog
       onSubmitSuccess?.()
     } catch (error) {
       handleErrorApi({
         error,
-        setError: form.setError,
+        setError: form.setError
       })
     }
   }
