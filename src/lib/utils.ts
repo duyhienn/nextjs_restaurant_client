@@ -5,7 +5,7 @@ import { UseFormSetError } from 'react-hook-form'
 import { twMerge } from 'tailwind-merge'
 import jwt, { JwtPayload } from 'jsonwebtoken'
 import authApiRequest from '@/apiRequests/auth'
-import { DishStatus, TableStatus } from '@/constants/type'
+import { DishStatus, Role, TableStatus } from '@/constants/type'
 import envConfig from '@/config'
 import { TokenPayload } from '@/types/jwt.types'
 
@@ -101,8 +101,8 @@ export const checkAndRefreshToken = async (params?: { onError?: () => void; onSu
   const accessToken = getAccessTokenFromLocalStorage()
   const refreshToken = getRefreshTokenFromLocalStorage()
   if (!accessToken || !refreshToken) return
-  const decodedAccessToken = jwt.decode(accessToken) as JwtPayload
-  const decodedRefreshToken = jwt.decode(refreshToken) as JwtPayload
+  const decodedAccessToken = jwt.decode(accessToken) as JwtPayload & TokenPayload
+  const decodedRefreshToken = jwt.decode(refreshToken) as JwtPayload & TokenPayload
 
   const now = new Date().getTime() / 1000 - 1
 
@@ -113,7 +113,8 @@ export const checkAndRefreshToken = async (params?: { onError?: () => void; onSu
 
   if (decodedAccessToken.exp! - now < (decodedAccessToken.exp! - decodedAccessToken.iat!) / 3) {
     try {
-      const res = await authApiRequest.refreshToken()
+      const role = decodedRefreshToken.role
+      const res = role === Role.Guest ? await authApiRequest.refreshToken() : await authApiRequest.refreshToken()
       setAccessTokenToLocalStorage(res.payload.data.accessToken)
       setRefreshTokenToLocalStorage(res.payload.data.refreshToken)
       if (params?.onSuccess) params.onSuccess()
