@@ -5,7 +5,7 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuTrigger,
+  DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
@@ -25,14 +25,14 @@ export default function DropdownAvatar() {
   const router = useRouter()
   const { data } = useAccountMe()
   const logoutMutation = useLogoutMutation()
-  const { setIsAuth } = useAppContext()
+  const { setRole } = useAppContext()
   const profile = data?.payload.data
 
   const logout = async () => {
     if (logoutMutation.isPending) return
     try {
       const result = await logoutMutation.mutateAsync()
-      setIsAuth(false)
+      setRole(undefined)
       router.push('/')
     } catch (error) {
       handleErrorApi({ error })

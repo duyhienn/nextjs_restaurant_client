@@ -7,6 +7,7 @@ import jwt, { JwtPayload } from 'jsonwebtoken'
 import authApiRequest from '@/apiRequests/auth'
 import { DishStatus, TableStatus } from '@/constants/type'
 import envConfig from '@/config'
+import { TokenPayload } from '@/types/jwt.types'
 
 const isBrowser = typeof window !== 'undefined'
 
@@ -30,7 +31,7 @@ export const normalizePath = (path: string) => {
 export const handleErrorApi = ({
   error,
   setError,
-  duration,
+  duration
 }: {
   error: any
   setError?: UseFormSetError<any>
@@ -40,7 +41,7 @@ export const handleErrorApi = ({
     error.payload.errors.forEach((item) => {
       setError(item.field, {
         type: 'server',
-        message: item.message,
+        message: item.message
       })
     })
   } else {
@@ -48,7 +49,7 @@ export const handleErrorApi = ({
       title: 'Error',
       description: error?.payload?.message ?? 'Unknown error',
       variant: 'destructive',
-      duration: duration ?? 2000,
+      duration: duration ?? 2000
     })
   }
 }
@@ -125,7 +126,7 @@ export const checkAndRefreshToken = async (params?: { onError?: () => void; onSu
 export const formatCurrency = (number: number) => {
   return new Intl.NumberFormat('vi-VN', {
     style: 'currency',
-    currency: 'VND',
+    currency: 'VND'
   }).format(number)
 }
 
@@ -153,4 +154,8 @@ export const getVietnameseTableStatus = (status: (typeof TableStatus)[keyof type
 
 export const getTableLink = ({ token, tableNumber }: { token: string; tableNumber: number }) => {
   return envConfig.NEXT_PUBLIC_URL + '/tables/' + tableNumber + '?token=' + token
+}
+
+export const deocodeToken = (token: string) => {
+  return jwt.decode(token) as TokenPayload
 }

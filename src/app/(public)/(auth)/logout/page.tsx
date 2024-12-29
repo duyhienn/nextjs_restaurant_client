@@ -8,7 +8,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { Suspense, useEffect, useRef } from 'react'
 
 function Logout() {
-  const { setIsAuth } = useAppContext()
+  const { setRole } = useAppContext()
   const { mutateAsync, isSuccess } = useLogoutMutation()
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -27,14 +27,14 @@ function Logout() {
           setTimeout(() => {
             ref.current = null
           }, 1000)
-          setIsAuth(false)
+          setRole(undefined)
           router.push('/login')
         }
       })
     } else {
       router.push('/')
     }
-  }, [mutateAsync, router, refreshTokenFromUrl, accessTokenFromUrl, setIsAuth])
+  }, [mutateAsync, router, refreshTokenFromUrl, accessTokenFromUrl, setRole])
   return <div>{isSuccess ? 'Log out....' : ''}</div>
 }
 

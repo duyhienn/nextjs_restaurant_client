@@ -5,7 +5,7 @@ import {
   getAccessTokenFromLocalStorage,
   getRefreshTokenFromLocalStorage,
   setAccessTokenToLocalStorage,
-  setRefreshTokenToLocalStorage,
+  setRefreshTokenToLocalStorage
 } from '@/lib/utils'
 import { usePathname, useRouter } from 'next/navigation'
 import { useEffect } from 'react'
@@ -24,7 +24,7 @@ export default function RefreshToken() {
       onError: () => {
         clearInterval(interval)
         router.push('/login')
-      },
+      }
     })
     const TIME_INTERVAL = 1000
     interval = setInterval(
@@ -33,7 +33,7 @@ export default function RefreshToken() {
           onError: () => {
             clearInterval(interval)
             router.push('/login')
-          },
+          }
         }),
       TIME_INTERVAL
     )
@@ -41,5 +41,5 @@ export default function RefreshToken() {
       clearInterval(interval)
     }
   }, [pathname, router])
-  return <div>refresh-token</div>
+  return null
 }

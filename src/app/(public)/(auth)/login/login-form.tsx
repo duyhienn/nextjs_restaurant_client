@@ -15,7 +15,7 @@ import { useEffect } from 'react'
 import { useAppContext } from '@/components/app-provider'
 
 export default function LoginForm() {
-  const { setIsAuth } = useAppContext()
+  const { setRole } = useAppContext()
   const router = useRouter()
   const searchParams = useSearchParams()
   const clearTokens = searchParams.get('clearTokens')
@@ -24,30 +24,30 @@ export default function LoginForm() {
     resolver: zodResolver(LoginBody),
     defaultValues: {
       email: '',
-      password: '',
-    },
+      password: ''
+    }
   })
 
   useEffect(() => {
     if (clearTokens) {
       removeTokensFromLocalStorage()
-      setIsAuth(false)
+      setRole(undefined)
     }
-  }, [clearTokens, setIsAuth])
+  }, [clearTokens, setRole])
 
   const onSubmit = async (body: LoginBodyType) => {
     if (loginMutation.isPending) return
     try {
       const result = await loginMutation.mutateAsync(body)
-      setIsAuth(true)
+      setRole(result.payload.data.account.role)
       toast({
-        description: result.payload.message,
+        description: result.payload.message
       })
       router.push('/manage/dashboard')
     } catch (error: any) {
       handleErrorApi({
         error,
-        setError: form.setError,
+        setError: form.setError
       })
     }
   }
