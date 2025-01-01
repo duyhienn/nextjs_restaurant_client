@@ -5,7 +5,7 @@ import { UseFormSetError } from 'react-hook-form'
 import { twMerge } from 'tailwind-merge'
 import jwt, { JwtPayload } from 'jsonwebtoken'
 import authApiRequest from '@/apiRequests/auth'
-import { DishStatus, Role, TableStatus } from '@/constants/type'
+import { DishStatus, OrderStatus, Role, TableStatus } from '@/constants/type'
 import envConfig from '@/config'
 import { TokenPayload } from '@/types/jwt.types'
 
@@ -150,6 +150,23 @@ export const getVietnameseTableStatus = (status: (typeof TableStatus)[keyof type
       return 'Đã đặt'
     default:
       return 'Ẩn'
+  }
+}
+
+export const getVietnameseOrderStatus = (status: (typeof OrderStatus)[keyof typeof OrderStatus]) => {
+  switch (status) {
+    case OrderStatus.Pending:
+      return 'Đang chờ'
+    case OrderStatus.Processing:
+      return 'Đang xử lý món ăn'
+    case OrderStatus.Delivered:
+      return 'Đã giao'
+    case OrderStatus.Paid:
+      return 'Đã thanh toán'
+    case OrderStatus.Rejected:
+      return 'Đã từ chối'
+    default:
+      return 'Đã hoàn thành'
   }
 }
 
