@@ -4,7 +4,7 @@ import {
   LoginResType,
   LogoutBodyType,
   RefreshTokenBodyType,
-  RefreshTokenResType,
+  RefreshTokenResType
 } from '@/schemaValidations/auth.schema'
 
 const authApiRequest = {
@@ -21,8 +21,8 @@ const authApiRequest = {
       { refreshToken: body.refreshToken },
       {
         headers: {
-          Authorization: `Bearer ${body.accessToken}`,
-        },
+          Authorization: `Bearer ${body.accessToken}`
+        }
       }
     ),
   /**
@@ -39,7 +39,7 @@ const authApiRequest = {
     const result = await this.refreshTokenRequest
     this.refreshTokenRequest = null
     return result
-  },
+  }
 }
 
 export default authApiRequest
